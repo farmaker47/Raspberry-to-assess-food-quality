@@ -85,7 +85,7 @@ class MQ2():
     # Remarks: This function assumes that the sensor is in clean air. It use  
     #          MQResistanceCalculation to calculates the sensor resistance in clean air 
     #          and then divides it with RO_CLEAN_AIR_FACTOR. RO_CLEAN_AIR_FACTOR is about 
-    #          10, which differs slightly between different sensors.
+    #          9.83, which differs slightly between different sensors.
     ############################################################################ 
     def MQ2_Calibration(self):
         val = 0.0
