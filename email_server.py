@@ -24,7 +24,7 @@ message.attach(MIMEText(body, 'plain'))
  
 csvname = '/home/george/Downloads/mq_sensors_log_2_days.csv'
  
-# open the file in bynary
+# open the file in binary
 binary_csv = open(csvname, 'rb')
  
 payload = MIMEBase('application', 'octate-stream', Name=csvname)
