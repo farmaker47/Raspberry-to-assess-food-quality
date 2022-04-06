@@ -28,13 +28,13 @@ csvname = '/home/george/Downloads/mq_sensors_log_2_days.csv'
 binary_csv = open(csvname, 'rb')
  
 payload = MIMEBase('application', 'octate-stream', Name=csvname)
-# payload = MIMEBase('application', 'pdf', Name=pdfname)
+# payload = MIMEBase('application', 'csv', Name=csvname)
 payload.set_payload((binary_csv).read())
  
 # enconding the binary into base64
 encoders.encode_base64(payload)
  
-# add header with pdf name
+# add header with csv name
 payload.add_header('Content-Decomposition', 'attachment', filename=csvname)
 message.attach(payload)
  
