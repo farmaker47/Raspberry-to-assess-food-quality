@@ -1,0 +1,1 @@
+Follow the instructions here https://www.tensorflow.org/lite/guide/python to install tflite-runtime in your Raspberry Pi. Then use the tflite file included in this folder and execute the python script.
