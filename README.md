@@ -6,6 +6,8 @@ This is an effort to assess food quality with the help of single board computers
 
 <img src="images/breadboard_w_sensors.jpg" width="600" height="400">
 
+<img src="images/sensors_wrap.jpg" width="600" height="400">
+
 Sensors used in this experiment:
 
 [MQ-2](https://github.com/farmaker47/Raspberry-to-assess-food-quality/blob/main/pdf/MQ-2.pdf),
