@@ -9,7 +9,7 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 class MQ2():
 
     ######################### Hardware Related Macros #########################
-    RL_VALUE                     = 5        # define the load resistance on the board, in kilo ohms
+    RL_VALUE                     = 10       # define the load resistance on the board, in kilo ohms
     RO_CLEAN_AIR_FACTOR          = 9.83     # RO_CLEAR_AIR_FACTOR=(Sensor resistance in clean air)/RO,
                                             # which is derived from the chart in datasheet
  
