@@ -20,3 +20,5 @@ Sensors used in this experiment:
 [MQ-9](https://github.com/farmaker47/Raspberry-to-assess-food-quality/blob/main/pdf/MQ-9.pdf)
 
 **Open the ml folder to use a cloab notebook along with the .csv file**
+
+More info at the [Medium](https://farmaker47.medium.com/detecting-food-quality-with-raspberry-and-tensorflow-c18f661d5c1d) blog post.
