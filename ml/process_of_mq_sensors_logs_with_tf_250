@@ -1,0 +1,755 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "process_of_mq_sensors_logs_with_tf_250_versionipynb",
+      "provenance": [],
+      "collapsed_sections": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Processing of the MQ sensors' logs"
+      ],
+      "metadata": {
+        "id": "tCuyquL9mnh3"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "In this **project**, we'll build a neural network and use it to predict food degradation over time."
+      ],
+      "metadata": {
+        "id": "XWWn0bJ2myKj"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### CAUTION = Because the tflite-runtime version of the Raspberry is 2.5.0 we have to install the specific one here.\n",
+        "\n",
+        "Check your version at Raspberry and use the same version below."
+      ],
+      "metadata": {
+        "id": "P4T2MBcIwfX8"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install tensorflow==2.5.0"
+      ],
+      "metadata": {
+        "id": "eO-2wVw9w72O"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import tensorflow as tf\n",
+        "print(tf.__version__)"
+      ],
+      "metadata": {
+        "id": "n8jdVSQ7DAEM"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "s8l7oHzDjejD"
+      },
+      "outputs": [],
+      "source": [
+        "#Importing modules\n",
+        "%matplotlib inline\n",
+        "%load_ext autoreload\n",
+        "%autoreload 2\n",
+        "%config InlineBackend.figure_format = 'retina'\n",
+        "\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "import matplotlib.pyplot as plt\n",
+        "import random"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Load and prepare the data\n",
+        "\n",
+        "A critical step in working with neural networks is preparing the data correctly."
+      ],
+      "metadata": {
+        "id": "PbsEQumgn1IB"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data_path1 = '/content/mq_sensors_log_ktinos_mera1.csv'\n",
+        "\n",
+        "df_feta1 = pd.read_csv(data_path1)\n",
+        "# Watch all columns\n",
+        "pd.options.display.max_columns = None\n",
+        "\n",
+        "# Add value 0 for the first hours and 1 for rest.\n",
+        "df_feta1.loc[0:740, 'day'] = 0\n",
+        "df_feta1.loc[740:, 'day'] = 1\n",
+        "\n",
+        "#rides_feta.head(10)\n",
+        "print(df_feta1[735:745])"
+      ],
+      "metadata": {
+        "id": "ScZyMM3YnHdK"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data_path2 = '/content/mq_sensors_log_ktinos_mera2.csv'\n",
+        "\n",
+        "df_feta2 = pd.read_csv(data_path2)\n",
+        "# Watch all columns\n",
+        "pd.options.display.max_columns = None\n",
+        "\n",
+        "# Add value 0 for the first hours and 1 for rest.\n",
+        "df_feta2.loc[0:740, 'day'] = 0\n",
+        "df_feta2.loc[740:, 'day'] = 1\n",
+        "\n",
+        "#rides_feta.head(10)\n",
+        "print(df_feta2[735:745])"
+      ],
+      "metadata": {
+        "id": "7QEsRB59arld"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data_path3 = '/content/mq_sensors_log_ktinos_mera3.csv'\n",
+        "\n",
+        "df_feta3 = pd.read_csv(data_path3)\n",
+        "# Watch all columns\n",
+        "pd.options.display.max_columns = None\n",
+        "\n",
+        "# Add value 0 for the first hours and 1 for rest.\n",
+        "df_feta3.loc[0:740, 'day'] = 0\n",
+        "df_feta3.loc[740:, 'day'] = 1\n",
+        "\n",
+        "#rides_feta.head(10)\n",
+        "print(df_feta3[735:745])"
+      ],
+      "metadata": {
+        "id": "73C_w3eLa7sI"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data_path4 = '/content/mq_sensors_log_ktinos_mera4.csv'\n",
+        "\n",
+        "df_feta4 = pd.read_csv(data_path4)\n",
+        "# Watch all columns\n",
+        "pd.options.display.max_columns = None\n",
+        "\n",
+        "# Add value 0 for the first hours and 1 for rest.\n",
+        "df_feta4.loc[0:740, 'day'] = 0\n",
+        "df_feta4.loc[740:, 'day'] = 1\n",
+        "\n",
+        "#rides_feta.head(10)\n",
+        "print(df_feta4[735:745])"
+      ],
+      "metadata": {
+        "id": "2gYJgu7hsoD6"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data_path5 = '/content/mq_sensors_log_ktinos_mera5.csv'\n",
+        "\n",
+        "df_feta5 = pd.read_csv(data_path5)\n",
+        "# Watch all columns\n",
+        "pd.options.display.max_columns = None\n",
+        "\n",
+        "# Add value 0 for the first hours and 1 for rest.\n",
+        "df_feta5.loc[0:740, 'day'] = 0\n",
+        "df_feta5.loc[740:, 'day'] = 1\n",
+        "\n",
+        "#rides_feta.head(10)\n",
+        "print(df_feta5[735:745])"
+      ],
+      "metadata": {
+        "id": "ruJmuN7g2Hh8"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Checking out the data\n",
+        "This dataset has logs from various different simple air sensors that are collected during food degradation over a period of time. Logs are collected in intervals of 1 minute so for one day we have 1440 entries. Check the basic set up for the [MQ-2 sensor](https://medium.com/p/5c7e2338267f) and the whole [bunch of air sensors](https://medium.com/p/b4523540f63d)."
+      ],
+      "metadata": {
+        "id": "2JG4jZIOoxHs"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Normalizing the values\n",
+        "We are dividing every log by 65472 wich is the maximum value each sensor can give. For more info read [this](https://github.com/adafruit/Adafruit_CircuitPython_MCP3xxx/blob/main/adafruit_mcp3xxx/analog_in.py#L50-L54)."
+      ],
+      "metadata": {
+        "id": "mAmDP9h3yGDM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "sensor_names = ['Raw_value_MQ2', 'Raw_value_MQ3', 'Raw_value_MQ4', 'Raw_value_MQ135', 'Raw_value_MQ6', 'Raw_value_MQ7', 'Raw_value_MQ8', 'Raw_value_MQ9']\n",
+        "sensor_names_with_day = ['Raw_value_MQ2', 'Raw_value_MQ3', 'Raw_value_MQ4', 'Raw_value_MQ135', 'Raw_value_MQ6', 'Raw_value_MQ7', 'Raw_value_MQ8', 'Raw_value_MQ9', 'day']\n",
+        "\n",
+        "MAX_VALUE = 65472\n",
+        "\n",
+        "for each in sensor_names:\n",
+        "    df_feta1.loc[:, each] = df_feta1[each] / MAX_VALUE\n",
+        "df_feta1[:10]\n",
+        "\n",
+        "for each in sensor_names:\n",
+        "    df_feta2.loc[:, each] = df_feta2[each] / MAX_VALUE\n",
+        "df_feta2[:10]\n",
+        "\n",
+        "for each in sensor_names:\n",
+        "    df_feta3.loc[:, each] = df_feta3[each] / MAX_VALUE\n",
+        "df_feta3[:10]\n",
+        "\n",
+        "for each in sensor_names:\n",
+        "    df_feta4.loc[:, each] = df_feta4[each] / MAX_VALUE\n",
+        "df_feta4[:10]\n",
+        "\n",
+        "for each in sensor_names:\n",
+        "    df_feta5.loc[:, each] = df_feta5[each] / MAX_VALUE\n",
+        "df_feta5[:10]"
+      ],
+      "metadata": {
+        "id": "LKti1J_jyktx"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Plot the diagram with normalized data\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ2')\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ3')\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ4')\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ135')\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ6')\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ7')\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ8')\n",
+        "df_feta5[:1440].plot(x='Timestamp', y='Raw_value_MQ9')"
+      ],
+      "metadata": {
+        "id": "RpO6jSNzztxF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "fields1 = df_feta1[sensor_names_with_day]\n",
+        "fields2 = df_feta2[sensor_names_with_day]\n",
+        "fields3 = df_feta3[sensor_names_with_day]\n",
+        "fields4 = df_feta4[sensor_names_with_day]\n",
+        "fields5 = df_feta5[sensor_names_with_day]"
+      ],
+      "metadata": {
+        "id": "w3rVyd422RYV"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Print a dataframe with normalized values and the day\n",
+        "fields5[735:745]"
+      ],
+      "metadata": {
+        "id": "6Y8Vf4qK938f"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### Splitting the data into training, testing, and validation sets\n",
+        "\n",
+        "We'll save the data for the first 50 minutes of each day as test set and split the rest as training and validation sets."
+      ],
+      "metadata": {
+        "id": "oFqYELh_wZrP"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# First take the good data\n",
+        "data_first_day_good = fields1[10:210]\n",
+        "data_second_day_good = fields2[10:210]\n",
+        "data_third_day_good = fields3[10:210]\n",
+        "data_forth_day_good = fields4[10:210]\n",
+        "data_fifth_day_good = fields5[10:210]\n",
+        "\n",
+        "# Then take the bad data\n",
+        "data_first_day_bad = fields1[-200:]\n",
+        "data_second_day_bad = fields2[-200:]\n",
+        "data_third_day_bad = fields3[-200:]\n",
+        "data_forth_day_bad = fields4[-200:]\n",
+        "data_fifth_day_bad = fields5[-200:]"
+      ],
+      "metadata": {
+        "id": "DkPgCSJ0sHWN"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data_all_days = [data_first_day_good, data_second_day_good,\n",
+        "                 data_third_day_good, data_forth_day_good, data_fifth_day_good,\n",
+        "                 data_first_day_bad, data_second_day_bad, \n",
+        "                 data_third_day_bad, data_forth_day_bad, data_fifth_day_bad]\n",
+        "data_rest = pd.concat(data_all_days)\n",
+        "\n",
+        "# Data for training.\n",
+        "data_training = data_rest[100:1900]\n",
+        "\n",
+        "# Data for testing.\n",
+        "test_data1 = data_rest[:100]\n",
+        "test_data2 = data_rest[1900:]\n",
+        "test_data_all = [test_data1, test_data2]\n",
+        "test_data = pd.concat(test_data_all)\n",
+        "\n",
+        "# SHUFFLE the dataset before splitting into training and validation and reset the index\n",
+        "data_training = data_training.sample(frac=1).reset_index(drop=True)\n",
+        "print(data_training[:10])\n",
+        "\n",
+        "# Separate the data into features and targets\n",
+        "target_field = ['day']\n",
+        "data_features, data_targets = data_training.drop(target_field, axis=1), data_training[target_field]\n",
+        "test_features, test_targets = test_data.drop(target_field, axis=1), test_data[target_field]"
+      ],
+      "metadata": {
+        "id": "AZ_lDJQHdwd8"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(test_data)"
+      ],
+      "metadata": {
+        "id": "B8Oz31Z45fSX"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Create test features list.\n",
+        "test_features_list=[]\n",
+        "\n",
+        "for row in test_features.iterrows():\n",
+        "    index, data = row\n",
+        "    test_features_list.append(data.tolist())\n",
+        "\n",
+        "# Create test targets list.\n",
+        "test_targets_list=[]\n",
+        "\n",
+        "for row in test_targets.iterrows():\n",
+        "    index, data = row\n",
+        "    test_targets_list.append(data.tolist())\n",
+        "\n",
+        "\n",
+        "# Create data features list.\n",
+        "data_features_list=[]\n",
+        "\n",
+        "for row in data_features.iterrows():\n",
+        "    index, data = row\n",
+        "    data_features_list.append(data.tolist())\n",
+        "\n",
+        "# Create data targets list.\n",
+        "data_targets_list=[]\n",
+        "\n",
+        "for row in data_targets.iterrows():\n",
+        "    index, data = row\n",
+        "    data_targets_list.append(data.tolist())"
+      ],
+      "metadata": {
+        "id": "j42CvPkxEloc"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "print(data_features_list[:10])\n",
+        "print(data_targets_list[:10])\n",
+        "print(len(data_targets_list))\n"
+      ],
+      "metadata": {
+        "id": "xi29igGtQ_Iz"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Split into training and validation data\n",
+        "# Hold out the last entries of the remaining data as a validation set\n",
+        "train_features, train_targets = np.array(data_features_list[:1500]), np.array(data_targets_list[:1500])\n",
+        "val_features, val_targets = np.array(data_features_list[1500:]), np.array(data_targets_list[1500:])\n",
+        "test_features, test_targets = np.array(test_features_list[:]), np.array(test_targets_list[:])"
+      ],
+      "metadata": {
+        "id": "P0bVagWxYEe8"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "print(len(train_features))\n",
+        "print(len(train_targets))\n",
+        "\n",
+        "\n",
+        "print(len(val_features))\n",
+        "print(len(val_targets))\n"
+      ],
+      "metadata": {
+        "id": "YlaNt76eYEhz"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Convert targets to categorical\n",
+        "train_targets_categorical = tf.keras.utils.to_categorical(train_targets, dtype =\"uint8\")\n",
+        "val_targets_categorical = tf.keras.utils.to_categorical(val_targets, dtype =\"uint8\")\n",
+        "test_targets_categorical = tf.keras.utils.to_categorical(test_targets, dtype =\"uint8\")"
+      ],
+      "metadata": {
+        "id": "Y3RCd06Pr4LF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(test_targets_categorical[97:105])"
+      ],
+      "metadata": {
+        "id": "xN5D5JFftVBO"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Build a Keras model to train the dataset."
+      ],
+      "metadata": {
+        "id": "5tFi6gswZXIM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from tensorflow import keras\n",
+        "from tensorflow.keras import Sequential\n",
+        "from tensorflow.keras.layers import Dense, Dropout\n",
+        "\n",
+        "model=Sequential()\n",
+        "model.add(Dense(256, input_dim=8,activation='relu'))\n",
+        "model.add(Dropout(0.1))\n",
+        "model.add(Dense(128, activation='relu'))\n",
+        "model.add(Dropout(0.1))\n",
+        "model.add(Dense(64, activation='relu'))\n",
+        "model.add(Dropout(0.1))\n",
+        "model.add(Dense(2))\n",
+        "\n",
+        "print(model.summary())"
+      ],
+      "metadata": {
+        "id": "PWlHyFQiYEkg"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from tensorflow.keras.optimizers import Adam\n",
+        "\n",
+        "\n",
+        "adam = Adam(learning_rate=0.000001)\n",
+        "# https://keras.io/api/losses/probabilistic_losses/#categorical_crossentropy-function\n",
+        "model.compile(loss='categorical_crossentropy', \n",
+        "             optimizer=adam, \n",
+        "             metrics=['accuracy'])"
+      ],
+      "metadata": {
+        "id": "B4x9GyApaAaq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from tensorflow.keras.callbacks import ModelCheckpoint  \n",
+        "\n",
+        "batch_size = 20\n",
+        "num_epochs = 370\n",
+        "\n",
+        "checkpoint = ModelCheckpoint(filepath='food_quality.weights.best.h5', verbose=1, \n",
+        "                               save_best_only=True)\n",
+        "\n",
+        "callbacks_list = [checkpoint]\n",
+        "\n",
+        "history = model.fit(train_features, train_targets_categorical, validation_data=(val_features, val_targets_categorical), batch_size=batch_size, epochs=num_epochs, callbacks=callbacks_list)"
+      ],
+      "metadata": {
+        "id": "cumJ4mSLQygq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Get history\n",
+        "history_dict = history.history\n",
+        "history_dict.keys()\n",
+        "\n",
+        "#dict_keys(['loss', 'accuracy', 'val_loss', 'val_accuracy'])\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "acc = history_dict['accuracy']\n",
+        "val_acc = history_dict['val_accuracy']\n",
+        "loss = history_dict['loss']\n",
+        "val_loss = history_dict['val_loss']\n",
+        "\n",
+        "epochs = range(1, len(acc) + 1)\n",
+        "\n",
+        "# \"g\" is for \"solid green line\"\n",
+        "plt.plot(epochs, loss, 'g', label='Training loss')\n",
+        "# b is for \"solid blue line\"\n",
+        "plt.plot(epochs, val_loss, 'b', label='Validation loss')\n",
+        "plt.title('Training and validation loss')\n",
+        "plt.xlabel('Epochs')\n",
+        "plt.ylabel('Loss')\n",
+        "plt.legend()\n",
+        "\n",
+        "plt.show()"
+      ],
+      "metadata": {
+        "id": "_kPD36K5KE-6"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Evaluate model with the test set\n",
+        "print(len(test_features))\n",
+        "scores = model.evaluate(test_features, test_targets_categorical, verbose=1)"
+      ],
+      "metadata": {
+        "id": "JnLKp5E2dTKO"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Predict outputs\n",
+        "for i in range(50):\n",
+        "  test_features = np.array(data_features_list[i])\n",
+        "  test_features = np.expand_dims(test_features, axis=0)\n",
+        "  print(test_features)\n",
+        "  score = model.predict(test_features, verbose=1)\n",
+        "  print(score)\n",
+        "  ##Show the argmax label\n",
+        "  print(tf.math.argmax(score[0]))\n",
+        "  print(\"\")"
+      ],
+      "metadata": {
+        "id": "XB8TfB9nePTz"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Reconstruct a new model from the .h5 format"
+      ],
+      "metadata": {
+        "id": "ysmP00Aa4WzV"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "reconstructed_model = keras.models.load_model(\"/content/food_quality.weights.best.h5\")"
+      ],
+      "metadata": {
+        "id": "acWNz4Bm2FcF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Evaluate the reconstructed model with an entry from the test set\n",
+        "score = reconstructed_model.predict(test_features, verbose=1)\n",
+        "print(score)\n",
+        "print(tf.math.argmax(score[0]))"
+      ],
+      "metadata": {
+        "id": "WpU1xX0I4rq4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Save the model to the saved model format\n",
+        "reconstructed_model.save('/content/saved_model')"
+      ],
+      "metadata": {
+        "id": "XAljufFi46J5"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Convert to tflite"
+      ],
+      "metadata": {
+        "id": "VqlUP7VK5Ilb"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Convert the model\n",
+        "converter = tf.lite.TFLiteConverter.from_saved_model('/content/saved_model') # path to the SavedModel directory\n",
+        "tflite_model = converter.convert()\n",
+        "\n",
+        "# Save the model.\n",
+        "with open('food_model_ktinos.tflite', 'wb') as f:\n",
+        "  f.write(tflite_model)"
+      ],
+      "metadata": {
+        "id": "CPezFEUh48yb"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "'''\n",
+        "test_features = [0.04007820136852395, 0.03734115347018573, 0.020527859237536656, 0.028347996089931573, 0.030303030303030304, 0.03616813294232649, 0.03479960899315738, 0.028347996089931573]\n",
+        "test_features = np.array(test_features)\n",
+        "test_features = np.expand_dims(test_features, axis=0)\n",
+        "print(test_features)\n",
+        "'''"
+      ],
+      "metadata": {
+        "id": "2xCOTJohD76W"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Load the TFLite model and allocate tensors.\n",
+        "interpreter = tf.lite.Interpreter(model_path=\"/content/food_model_ktinos.tflite\")\n",
+        "interpreter.allocate_tensors()\n",
+        "\n",
+        "# Get input and output tensors details.\n",
+        "input_details = interpreter.get_input_details()\n",
+        "output_details = interpreter.get_output_details()\n",
+        "print(input_details)\n",
+        "print(output_details)\n",
+        "\n",
+        "interpreter.set_tensor(input_details[0]['index'], tf.cast(test_features, tf.float32))\n",
+        "\n",
+        "interpreter.invoke()\n",
+        "\n",
+        "# The function `get_tensor()` returns a copy of the tensor data.\n",
+        "# Use `tensor()` in order to get a pointer to the tensor.\n",
+        "output_data = interpreter.get_tensor(output_details[0]['index'])\n",
+        "print(output_data)"
+      ],
+      "metadata": {
+        "id": "SCCWgEEj6X1Z"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
